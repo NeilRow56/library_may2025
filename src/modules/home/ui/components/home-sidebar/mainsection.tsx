@@ -7,10 +7,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
-import { FlameIcon, HomeIcon, PlaySquareIcon } from 'lucide-react'
+import { DockIcon, FlameIcon, HomeIcon, PlaySquareIcon } from 'lucide-react'
 import Link from 'next/link'
 
 const items = [
+  {
+    title: 'Admin',
+    url: '/admin',
+    icon: DockIcon
+  },
   {
     title: 'Catalogue',
     url: '/',
