@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import SearchBar from './search-bar'
+import { NavMenu } from './nav-menu'
 
 export const HomeNavbar = () => {
   return (
@@ -28,15 +29,14 @@ export const HomeNavbar = () => {
             </div>
           </Link>
         </div>
-        <div className='container mx-auto flex flex-col pr-8'>
-          <div className='flex'>
-            {/* Search bar */}
-            <div className='mx-auto flex max-w-[720px] flex-1 justify-center'>
-              <SearchBar />
-            </div>
-            <div className='flex flex-shrink-0 items-center gap-4'>
-              Auth Button
-            </div>
+        <div className='container mx-auto flex justify-between pr-8'>
+          {/* Search bar */}
+          <div className='flex max-w-[720px] flex-1 justify-center'>
+            <SearchBar />
+          </div>
+          <NavMenu />
+          <div className='flex flex-shrink-0 items-center justify-end gap-4'>
+            Auth Button
           </div>
         </div>
       </div>

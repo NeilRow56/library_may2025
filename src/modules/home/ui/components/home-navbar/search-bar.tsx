@@ -26,7 +26,7 @@ function SearchBar() {
     }
   }
   return (
-    <form action={doSearch} className='hidden md:flex'>
+    <form action={doSearch} className='hidden lg:block'>
       <div className='flex w-full space-y-2 sm:items-center sm:space-y-0 sm:space-x-2 md:flex-row lg:max-w-lg'>
         <p className='min-w-[70px] text-sm text-slate-500'>Search by</p>
         <Select name='search_by'>
