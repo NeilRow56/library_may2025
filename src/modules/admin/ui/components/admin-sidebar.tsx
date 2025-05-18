@@ -75,48 +75,6 @@ const data = {
       ]
     },
     {
-      title: 'Activities',
-      url: '#',
-      icon: PartyPopperIcon,
-      items: [
-        {
-          title: 'Activities schedule',
-          url: '/admin/activities'
-        },
-        {
-          title: 'Explorer',
-          url: '#'
-        },
-        {
-          title: 'Quantum',
-          url: '#'
-        }
-      ]
-    },
-    {
-      title: 'Fines',
-      url: '#',
-      icon: Receipt,
-      items: [
-        {
-          title: 'Fines schedule',
-          url: '/admin/fines'
-        },
-        {
-          title: 'Get Started',
-          url: '#'
-        },
-        {
-          title: 'Tutorials',
-          url: '#'
-        },
-        {
-          title: 'Changelog',
-          url: '#'
-        }
-      ]
-    },
-    {
       title: 'Categories',
       url: '#',
       icon: Settings2,
@@ -140,6 +98,25 @@ const data = {
       ]
     },
     {
+      title: 'Activities',
+      url: '#',
+      icon: PartyPopperIcon,
+      items: [
+        {
+          title: 'Activities schedule',
+          url: '/admin/activities'
+        },
+        {
+          title: 'Explorer',
+          url: '#'
+        },
+        {
+          title: 'Quantum',
+          url: '#'
+        }
+      ]
+    },
+    {
       title: 'Users',
       url: '#',
       icon: User2Icon,
@@ -158,6 +135,29 @@ const data = {
         },
         {
           title: 'Limits',
+          url: '#'
+        }
+      ]
+    },
+    {
+      title: 'Fines',
+      url: '#',
+      icon: Receipt,
+      items: [
+        {
+          title: 'Fines schedule',
+          url: '/admin/fines'
+        },
+        {
+          title: 'Get Started',
+          url: '#'
+        },
+        {
+          title: 'Tutorials',
+          url: '#'
+        },
+        {
+          title: 'Changelog',
           url: '#'
         }
       ]
