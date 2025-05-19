@@ -6,6 +6,9 @@ import { Loader2 } from 'lucide-react'
 
 interface iAppProps {
   text: string
+  children: React.ReactNode
+  className?: string
+  loading: boolean | undefined
   variant?:
     | 'default'
     | 'destructive'
@@ -17,19 +20,34 @@ interface iAppProps {
     | undefined
 }
 
-export function SubmitButton({ text, variant }: iAppProps) {
+export function SubmitButton({
+  text,
+  variant,
+  children,
+  className,
+  loading,
+  disabled
+}: iAppProps & React.HTMLProps<HTMLButtonElement>) {
   const { pending } = useFormStatus()
+  const isSubmitting = pending || loading
   return (
-    <>
-      {pending ? (
-        <Button disabled className='w-full' variant={variant}>
-          <Loader2 className='mr-2 size-4 animate-spin' /> Please wait...
-        </Button>
+    <Button
+      disabled={isSubmitting || disabled}
+      type='submit'
+      className={className}
+    >
+      {isSubmitting ? (
+        <div className='flex items-center justify-center gap-2'>
+          {children}
+          <div className='h-fit w-fit animate-spin'>
+            <Loader2 />
+          </div>
+        </div>
       ) : (
         <Button type='submit' className='w-full' variant={variant}>
           {text}
         </Button>
       )}
-    </>
+    </Button>
   )
 }
