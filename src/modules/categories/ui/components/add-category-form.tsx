@@ -13,7 +13,7 @@ import { createCategorySchema } from '@/schemas/category'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useFormStatus } from 'react-dom'
+import { useTransition } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -26,7 +26,7 @@ type AddCategoryFormProps = {
 
 export const AddCategoryForm = ({ onSave }: AddCategoryFormProps) => {
   const path = usePathname()
-  const { pending } = useFormStatus()
+  const [isPending, startTransition] = useTransition()
   const form = useForm<z.infer<typeof createCategorySchema>>({
     resolver: zodResolver(createCategorySchema),
     defaultValues: {
@@ -35,16 +35,18 @@ export const AddCategoryForm = ({ onSave }: AddCategoryFormProps) => {
   })
 
   const processForm: SubmitHandler<Inputs> = async data => {
-    const result = await addCategory(data, path)
+    startTransition(async () => {
+      const result = await addCategory(data, path)
 
-    if (result?.error) {
-      toast.error(result.error)
-      return
-    }
-    onSave()
-    toast.success('Category created successfully!')
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+      onSave()
+
+      toast.success(`${data.name} category created`)
+    })
   }
-
   return (
     <>
       <Form {...form}>
@@ -64,13 +66,13 @@ export const AddCategoryForm = ({ onSave }: AddCategoryFormProps) => {
           />
 
           <div className='w-[150px] py-2'>
-            {pending ? (
+            {isPending ? (
               <Button disabled className='w-full'>
                 <Loader2 className='mr-2 size-4 animate-spin' /> Please wait...
               </Button>
             ) : (
               <Button type='submit' className='w-full'>
-                Create category
+                Save category
               </Button>
             )}
           </div>

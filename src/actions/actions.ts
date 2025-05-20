@@ -15,7 +15,7 @@ export async function addCategory(
 ) {
   const validatedFields = createCategorySchema.safeParse(data)
   if (!validatedFields.success) {
-    return { error: 'Invalid fields!' }
+    return { error: 'Invalid fields!', message: validatedFields.error.message }
   }
 
   const { name } = validatedFields.data
@@ -31,8 +31,7 @@ export async function addCategory(
     revalidatePath(path)
     return {
       category,
-      success: true,
-      message: 'Category created successfully'
+      success: true
     }
   } catch (error) {
     console.error('Database Error:', error)
