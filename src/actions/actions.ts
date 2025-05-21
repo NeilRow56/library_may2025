@@ -38,3 +38,20 @@ export async function addCategory(
     throw new Error('Failed to create category.')
   }
 }
+
+export async function deleteCategory(id: number, path: string) {
+  try {
+    await db.$transaction([
+      db.book_categories.delete({
+        where: {
+          category_id: id
+        }
+      })
+    ])
+
+    revalidatePath(path)
+  } catch (error) {
+    console.error('Database Error:', error)
+    throw new Error('Failed to delete category.')
+  }
+}
