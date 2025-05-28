@@ -1,15 +1,12 @@
 import { z } from 'zod'
 
-export const createCategorySchema = z.object({
+export const categorySchema = z.object({
+  // id is used so that we can use the same form for editing and creation
+  id: z.number().default(-1),
   name: z
     .string()
     .min(2, {
       message: 'Category must be entered'
     })
     .max(20)
-})
-
-// Schema for updating categories
-export const updateProductSchema = createCategorySchema.extend({
-  id: z.string().min(1, 'Id is required')
 })

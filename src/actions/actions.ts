@@ -1,24 +1,14 @@
 'use server'
 
 import db from '@/lib/db'
-import * as z from 'zod'
+
 import { revalidatePath } from 'next/cache'
-import { createCategorySchema } from '@/schemas/category'
 
 ////////////////////////////////////////////////////////////////////////////////
 //              Category
 ////////////////////////////////////////////////////////////////////////////////
 
-export async function addCategory(
-  data: z.infer<typeof createCategorySchema>,
-  path: string
-) {
-  const validatedFields = createCategorySchema.safeParse(data)
-  if (!validatedFields.success) {
-    return { error: 'Invalid fields!', message: validatedFields.error.message }
-  }
-
-  const { name } = validatedFields.data
+export async function addCategory(name: string, path: string) {
   try {
     const category = await db.$transaction([
       db.book_categories.create({
@@ -29,18 +19,41 @@ export async function addCategory(
     ])
 
     revalidatePath(path)
-    return {
-      category,
-      success: true
-    }
+    return category
   } catch (error) {
-    console.error('Database Error:', error)
-    throw new Error('Failed to create category.')
+    throw error
+  }
+}
+
+export async function updateCategory(id: number, name: string, path: string) {
+  if (!id) throw new Error('Missing id')
+
+  try {
+    await db.$transaction([
+      db.book_categories.update({
+        where: {
+          category_id: id
+        },
+
+        data: {
+          category_name: name
+        }
+      })
+    ])
+
+    revalidatePath(path)
+  } catch (error) {
+    throw error
   }
 }
 
 export async function deleteCategory(id: number, path: string) {
   try {
+    const categoryExists = await db.book_categories.findFirst({
+      where: { category_id: id }
+    })
+
+    if (!categoryExists) throw new Error('Category not found')
     await db.$transaction([
       db.book_categories.delete({
         where: {

@@ -1,83 +1,104 @@
-import { addCategory } from '@/actions/actions'
-import { Button } from '@/components/ui/button'
+import React, { useEffect } from 'react'
+
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage
+  FormLabel
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { createCategorySchema } from '@/schemas/category'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
-import { usePathname } from 'next/navigation'
-import { useTransition } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+
 import { z } from 'zod'
+import { useForm } from 'react-hook-form'
 
-type Inputs = z.infer<typeof createCategorySchema>
+import { addCategory, updateCategory } from '@/actions/actions'
+import { usePathname } from 'next/navigation'
 
-type AddCategoryFormProps = {
-  onSave: () => void
+import { Category } from './columns'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { customResolver } from '@/components/custom-resolver'
+
+type Props = {
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  category?: Category
 }
 
-export const AddCategoryForm = ({ onSave }: AddCategoryFormProps) => {
+const formSchema = z.object({
+  id: z.number().default(-1),
+  name: z
+    .string()
+    .min(2, {
+      message: 'Category must be entered'
+    })
+    .max(20)
+})
+
+function AddCategoryDialog({ setOpen, open, category }: Props) {
   const path = usePathname()
-  const [isPending, startTransition] = useTransition()
-  const form = useForm<z.infer<typeof createCategorySchema>>({
-    resolver: zodResolver(createCategorySchema),
-    defaultValues: {
-      name: ''
-    }
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: customResolver(formSchema),
+    defaultValues: { name: '' }
   })
 
-  const processForm: SubmitHandler<Inputs> = async data => {
-    startTransition(async () => {
-      const result = await addCategory(data, path)
+  useEffect(() => {
+    if (category) {
+      form.setValue('id', category.category_id)
+      form.setValue('name', category.category_name)
+    }
+  }, [category, form])
 
-      if (result.error) {
-        toast.error(result.error)
-        return
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (category) {
+        await updateCategory(category.category_id, values.name, path)
+      } else {
+        await addCategory(values, path)
       }
-      onSave()
 
-      toast.success(`${data.name} category created`)
-    })
+      form.reset()
+    } catch (error) {
+      console.log(error)
+    }
   }
-  return (
-    <>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(processForm)} className='space-y-1'>
-          <FormField
-            control={form.control}
-            name='name'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel></FormLabel>
-                <FormControl>
-                  <Input placeholder='category name...' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
-          <div className='w-[150px] py-2'>
-            {isPending ? (
-              <Button disabled className='w-full'>
-                <Loader2 className='mr-2 size-4 animate-spin' /> Please wait...
-              </Button>
-            ) : (
-              <Button type='submit' className='w-full'>
-                Save category
-              </Button>
-            )}
-          </div>
-        </form>
-      </Form>
-    </>
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add category</DialogTitle>
+          <DialogDescription></DialogDescription>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-1'>
+              <FormField
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder='category name' {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <Button type='submit'>Save</Button>
+            </form>
+          </Form>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   )
 }
+
+export default AddCategoryDialog

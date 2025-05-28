@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { startTransition, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { deleteCategory } from '@/actions/actions'
+import AddCategoryDialog from '@/components/dialogs/category-dialog-component'
 
 type props = {
   data: {
@@ -18,7 +19,7 @@ type props = {
 function CategoriesTable({ data }: { data: props }) {
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false)
   const [itemToAction, setItemToAction] = useState<Category>()
-
+  const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
   const handleRowDelete = (item: Category) => {
@@ -27,7 +28,8 @@ function CategoriesTable({ data }: { data: props }) {
   }
 
   const handleRowEdit = (item: Category) => {
-    console.log('Edit', item)
+    setItemToAction(item)
+    setOpen(true)
   }
 
   const handleConfirm = async () => {
@@ -38,7 +40,7 @@ function CategoriesTable({ data }: { data: props }) {
         await deleteCategory(itemToAction.category_id, pathname)
       })
 
-      toast(`${itemToAction.category_name} deleted`)
+      toast(`${itemToAction.category_name} catgory deleted`)
     }
   }
   return (
@@ -50,6 +52,12 @@ function CategoriesTable({ data }: { data: props }) {
         filter_column='category_name'
         onRowDelete={handleRowDelete}
         onRowEdit={handleRowEdit}
+      />
+
+      <AddCategoryDialog
+        open={open}
+        setOpen={setOpen}
+        category={itemToAction}
       />
 
       <ConfirmationDialog
