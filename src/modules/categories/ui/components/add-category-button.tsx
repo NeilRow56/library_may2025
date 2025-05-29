@@ -4,7 +4,8 @@ import React, { useState } from 'react'
 
 import { PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import AddCategoryDialog from '@/components/dialogs/category-dialog-component'
+
+import AddCategoryForm from './add-category-form'
 
 export const AddCategoryButton = () => {
   const [open, setOpen] = useState(false)
@@ -14,7 +15,7 @@ export const AddCategoryButton = () => {
         <PlusIcon />
         Add category
       </Button>
-      <AddCategoryDialog open={open} setOpen={setOpen} />
+      <AddCategoryForm open={open} setOpen={setOpen} type='Create' />
     </div>
   )
 }

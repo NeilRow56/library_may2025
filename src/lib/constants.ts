@@ -1,4 +1,4 @@
 export const categoryDefaultValues = {
-  id: '',
-  name: ''
+  category_id: '',
+  category_name: ''
 }

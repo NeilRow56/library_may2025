@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import {
   Form,
@@ -9,9 +9,8 @@ import {
 } from '@/components/ui/form'
 
 import { z } from 'zod'
-import { useForm } from 'react-hook-form'
+import { ControllerRenderProps, SubmitHandler, useForm } from 'react-hook-form'
 
-import { addCategory, updateCategory } from '@/actions/actions'
 import { usePathname } from 'next/navigation'
 
 import { Category } from './columns'
@@ -25,49 +24,67 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { customResolver } from '@/components/custom-resolver'
+import { insertCategorySchema, updateCategorySchema } from '@/lib/validators'
+import { createBookCategory, updateBookCategory } from '@/lib/actions/category'
+import { categoryDefaultValues } from '@/lib/constants'
+
+import { toast } from 'sonner'
 
 type Props = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   category?: Category
+  category_id?: number
+  type: 'Create' | 'Update'
 }
 
-const formSchema = z.object({
-  id: z.number().default(-1),
-  name: z
-    .string()
-    .min(2, {
-      message: 'Category must be entered'
-    })
-    .max(20)
-})
-
-function AddCategoryDialog({ setOpen, open, category }: Props) {
+function AddCategoryForm({
+  setOpen,
+  open,
+  category,
+  category_id,
+  type
+}: Props) {
   const path = usePathname()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: customResolver(formSchema),
-    defaultValues: { name: '' }
+  const form = useForm<z.infer<typeof insertCategorySchema>>({
+    resolver:
+      type === 'Update'
+        ? customResolver(updateCategorySchema)
+        : customResolver(insertCategorySchema),
+    defaultValues:
+      category && type === 'Update' ? category : categoryDefaultValues
   })
 
-  useEffect(() => {
-    if (category) {
-      form.setValue('id', category.category_id)
-      form.setValue('name', category.category_name)
-    }
-  }, [category, form])
+  const onSubmit: SubmitHandler<
+    z.infer<typeof insertCategorySchema>
+  > = async values => {
+    // On Create
+    if (type === 'Create') {
+      const res = await createBookCategory(values, path)
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      if (category) {
-        await updateCategory(category.category_id, values.name, path)
+      if (!res.success) {
+        toast.error('Book category not created')
       } else {
-        await addCategory(values, path)
+        toast.success('Book category created')
+      }
+      form.reset()
+    }
+
+    // On Update
+    if (type === 'Update') {
+      if (!category_id) {
+        return
       }
 
+      const res = await updateBookCategory({ ...values, category_id }, path)
+
+      if (!res.success) {
+        toast.error('Error - Book category not updated')
+      } else {
+        toast.success('Book category updated')
+      }
       form.reset()
-    } catch (error) {
-      console.log(error)
     }
   }
 
@@ -75,14 +92,21 @@ function AddCategoryDialog({ setOpen, open, category }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add category</DialogTitle>
+          <DialogTitle>Create category</DialogTitle>
           <DialogDescription></DialogDescription>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-1'>
               <FormField
                 control={form.control}
-                name='name'
-                render={({ field }) => (
+                name='category_name'
+                render={({
+                  field
+                }: {
+                  field: ControllerRenderProps<
+                    z.infer<typeof insertCategorySchema>,
+                    'category_name'
+                  >
+                }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
                     <FormControl>
@@ -92,7 +116,16 @@ function AddCategoryDialog({ setOpen, open, category }: Props) {
                 )}
               />
 
-              <Button type='submit'>Save</Button>
+              <Button
+                type='submit'
+                size='lg'
+                disabled={form.formState.isSubmitting}
+                className='button col-span-2 mt-4 w-full'
+              >
+                {form.formState.isSubmitting
+                  ? 'Submitting'
+                  : `${type} book category`}
+              </Button>
             </form>
           </Form>
         </DialogHeader>
@@ -101,4 +134,4 @@ function AddCategoryDialog({ setOpen, open, category }: Props) {
   )
 }
 
-export default AddCategoryDialog
+export default AddCategoryForm
