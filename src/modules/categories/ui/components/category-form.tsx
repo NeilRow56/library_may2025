@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 
 import {
@@ -5,7 +7,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel
+  FormMessage
 } from '@/components/ui/form'
 
 import { z } from 'zod'
@@ -14,13 +16,7 @@ import { ControllerRenderProps, SubmitHandler, useForm } from 'react-hook-form'
 import { usePathname } from 'next/navigation'
 
 import { Category } from './columns'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { customResolver } from '@/components/custom-resolver'
@@ -31,20 +27,13 @@ import { categoryDefaultValues } from '@/lib/constants'
 import { toast } from 'sonner'
 
 type Props = {
-  open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
   category?: Category
   category_id?: number
   type: 'Create' | 'Update'
+  onSave: () => void
 }
 
-function AddCategoryForm({
-  setOpen,
-  open,
-  category,
-  category_id,
-  type
-}: Props) {
+function CategoryForm({ category, category_id, type, onSave }: Props) {
   const path = usePathname()
 
   const form = useForm<z.infer<typeof insertCategorySchema>>({
@@ -68,6 +57,7 @@ function AddCategoryForm({
       } else {
         toast.success('Book category created')
       }
+      onSave()
       form.reset()
     }
 
@@ -89,49 +79,47 @@ function AddCategoryForm({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create category</DialogTitle>
-          <DialogDescription></DialogDescription>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-1'>
-              <FormField
-                control={form.control}
-                name='category_name'
-                render={({
-                  field
-                }: {
-                  field: ControllerRenderProps<
-                    z.infer<typeof insertCategorySchema>,
-                    'category_name'
-                  >
-                }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <Input placeholder='category name' {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <Button
-                type='submit'
-                size='lg'
-                disabled={form.formState.isSubmitting}
-                className='button col-span-2 mt-4 w-full'
+    <>
+      <Form {...form}>
+        <form
+          method='POST'
+          onSubmit={form.handleSubmit(onSubmit)}
+          className='flex w-full flex-col space-y-1'
+        >
+          <FormField
+            control={form.control}
+            name='category_name'
+            render={({
+              field
+            }: {
+              field: ControllerRenderProps<
+                z.infer<typeof insertCategorySchema>,
+                'category_name'
               >
-                {form.formState.isSubmitting
-                  ? 'Submitting'
-                  : `${type} book category`}
-              </Button>
-            </form>
-          </Form>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+            }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder='category name' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type='submit'
+            size='lg'
+            disabled={form.formState.isSubmitting}
+            className='button col-span-2 mt-4 w-full'
+          >
+            {form.formState.isSubmitting
+              ? 'Submitting'
+              : `${type} book category`}
+          </Button>
+        </form>
+      </Form>
+    </>
   )
 }
 
-export default AddCategoryForm
+export default CategoryForm

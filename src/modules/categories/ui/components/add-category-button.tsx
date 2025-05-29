@@ -1,21 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
-
-import { PlusIcon } from 'lucide-react'
+import { CategoryTitle2 } from '@/components/dialogs/category-title2'
 import { Button } from '@/components/ui/button'
-
-import AddCategoryForm from './add-category-form'
+import { useState } from 'react'
 
 export const AddCategoryButton = () => {
   const [open, setOpen] = useState(false)
   return (
-    <div>
+    <>
       <Button className='cursor-pointer self-end' onClick={() => setOpen(true)}>
-        <PlusIcon />
-        Add category
+        Add Category title
       </Button>
-      <AddCategoryForm open={open} setOpen={setOpen} type='Create' />
-    </div>
+      <CategoryTitle2 open={open} setOpen={setOpen} />
+    </>
   )
 }

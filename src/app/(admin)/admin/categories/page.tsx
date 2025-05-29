@@ -1,5 +1,6 @@
-import { AddCategoryButton } from '@/modules/categories/ui/components/add-category-button'
 import db from '@/lib/db'
+import { AddCategoryButton } from '@/modules/categories/ui/components/add-category-button'
+
 import CategoriesTable from '@/modules/categories/ui/components/categories-table'
 
 async function CategoriesPage() {
@@ -9,7 +10,7 @@ async function CategoriesPage() {
   ])
 
   return (
-    <div className='flex flex-col space-y-4 p-2'>
+    <div className='container mx-auto flex flex-col space-y-4 p-2'>
       <div className='flex w-full justify-end'>
         <AddCategoryButton />
       </div>

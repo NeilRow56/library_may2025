@@ -6,7 +6,7 @@ export const insertCategorySchema = z.object({
   category_name: z
     .string()
     .min(2, {
-      message: 'Category must be entered'
+      message: 'Category name must be entered'
     })
     .max(20)
 })
