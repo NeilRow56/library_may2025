@@ -55,7 +55,7 @@ function CategoryForm({ category, category_id, type, onSave }: Props) {
       if (!res.success) {
         toast.error('Book category not created')
       } else {
-        toast.success('Book category created')
+        toast.success(`${res.category?.category_name} catgory created`)
       }
       onSave()
       form.reset()

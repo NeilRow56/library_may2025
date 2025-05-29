@@ -6,9 +6,10 @@ import { ConfirmationDialog } from '@/components/dialogs/confirmation-dialog'
 import { toast } from 'sonner'
 import { startTransition, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { deleteCategory } from '@/actions/actions'
+
 // import AddCategoryDialog from '@/components/dialogs/category-dialog-component'
 import { CategoryTitle2 } from '@/components/dialogs/category-title2'
+import { deleteCategory } from '@/lib/actions/category'
 
 type props = {
   data: {

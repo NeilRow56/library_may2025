@@ -21,6 +21,7 @@ export async function createBookCategory(
 
     return {
       success: true,
+      category,
       message: 'Category created successfully'
     }
   } catch (error) {
@@ -54,5 +55,27 @@ export async function updateBookCategory(
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
+  }
+}
+
+export async function deleteCategory(id: number, path: string) {
+  try {
+    const categoryExists = await db.book_categories.findFirst({
+      where: { category_id: id }
+    })
+
+    if (!categoryExists) throw new Error('Category not found')
+    await db.$transaction([
+      db.book_categories.delete({
+        where: {
+          category_id: id
+        }
+      })
+    ])
+
+    revalidatePath(path)
+  } catch (error) {
+    console.error('Database Error:', error)
+    throw new Error('Failed to delete category.')
   }
 }
