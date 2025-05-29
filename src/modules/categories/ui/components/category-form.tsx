@@ -1,17 +1,18 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage
 } from '@/components/ui/form'
 
 import { z } from 'zod'
-import { ControllerRenderProps, SubmitHandler, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 import { usePathname } from 'next/navigation'
 
@@ -20,9 +21,8 @@ import { Category } from './columns'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { customResolver } from '@/components/custom-resolver'
-import { insertCategorySchema, updateCategorySchema } from '@/lib/validators'
+import { formSchema } from '@/lib/validators'
 import { createBookCategory, updateBookCategory } from '@/lib/actions/category'
-import { categoryDefaultValues } from '@/lib/constants'
 
 import { toast } from 'sonner'
 
@@ -33,51 +33,76 @@ type Props = {
   onSave: () => void
 }
 
-function CategoryForm({ category, category_id, type, onSave }: Props) {
+function CategoryForm({ category, type, onSave }: Props) {
   const path = usePathname()
 
-  const form = useForm<z.infer<typeof insertCategorySchema>>({
-    resolver:
-      type === 'Update'
-        ? customResolver(updateCategorySchema)
-        : customResolver(insertCategorySchema),
-    defaultValues:
-      category && type === 'Update' ? category : categoryDefaultValues
+  // const form = useForm<z.infer<typeof insertCategorySchema>>({
+  //   resolver:
+  //     type === 'Update'
+  //       ? customResolver(updateCategorySchema)
+  //       : customResolver(insertCategorySchema),
+  //   defaultValues:
+  //     category && type === 'Update' ? category : categoryDefaultValues
+  // })
+
+  // const onSubmit: SubmitHandler<
+  //   z.infer<typeof insertCategorySchema>
+  // > = async values => {
+  //   // On Create
+  //   if (type === 'Create') {
+  //     const res = await createBookCategory(values, path)
+
+  //     if (!res.success) {
+  //       toast.error('Book category not created')
+  //     } else {
+  //       toast.success(`${res.category?.category_name} catgory created`)
+  //     }
+  //     onSave()
+  //   }
+
+  //   // On Update
+  //   if (type === 'Update') {
+  //     if (!category_id) {
+  //       return
+  //     }
+
+  //     const res = await updateBookCategory({ ...values, category_id }, path)
+
+  //     if (!res.success) {
+  //       toast.error('Error - Book category not updated')
+  //     } else {
+  //       toast.success('Book category updated')
+  //     }
+  //     form.reset()
+  //   }
+  // }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: customResolver(formSchema),
+    defaultValues: { name: '' }
   })
 
-  const onSubmit: SubmitHandler<
-    z.infer<typeof insertCategorySchema>
-  > = async values => {
-    // On Create
-    if (type === 'Create') {
-      const res = await createBookCategory(values, path)
-
-      if (!res.success) {
-        toast.error('Book category not created')
-      } else {
-        toast.success(`${res.category?.category_name} catgory created`)
-      }
-      onSave()
-      form.reset()
+  useEffect(() => {
+    if (category) {
+      form.setValue('id', category.category_id)
+      form.setValue('name', category.category_name)
     }
+  }, [category, form])
 
-    // On Update
-    if (type === 'Update') {
-      if (!category_id) {
-        return
-      }
-
-      const res = await updateBookCategory({ ...values, category_id }, path)
-
-      if (!res.success) {
-        toast.error('Error - Book category not updated')
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (category) {
+        await updateBookCategory(category.category_id, values.name, path)
       } else {
-        toast.success('Book category updated')
+        await createBookCategory(values.name, path)
       }
+
+      toast.success('Book category updated')
       form.reset()
+      onSave()
+    } catch (error) {
+      console.log(error)
     }
   }
-
   return (
     <>
       <Form {...form}>
@@ -88,16 +113,10 @@ function CategoryForm({ category, category_id, type, onSave }: Props) {
         >
           <FormField
             control={form.control}
-            name='category_name'
-            render={({
-              field
-            }: {
-              field: ControllerRenderProps<
-                z.infer<typeof insertCategorySchema>,
-                'category_name'
-              >
-            }) => (
+            name='name'
+            render={({ field }) => (
               <FormItem>
+                <FormLabel>Category</FormLabel>
                 <FormControl>
                   <Input placeholder='category name' {...field} />
                 </FormControl>

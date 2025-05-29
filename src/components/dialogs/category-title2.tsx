@@ -12,11 +12,12 @@ interface CategoryTitle2Props {
   // message: string
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  type: 'Create' | 'Update'
   // onClose: () => void
   // onConfirm: () => void
 }
 
-export function CategoryTitle2({ open, setOpen }: CategoryTitle2Props) {
+export function CategoryTitle2({ open, setOpen, type }: CategoryTitle2Props) {
   const handleCloseDialog = () => {
     setOpen(false)
   }
@@ -27,7 +28,7 @@ export function CategoryTitle2({ open, setOpen }: CategoryTitle2Props) {
           <DialogTitle>Category title</DialogTitle>
           <DialogDescription>Enter a name for the category</DialogDescription>
         </DialogHeader>
-        <CategoryForm type='Create' onSave={handleCloseDialog} />
+        <CategoryForm type={type} onSave={handleCloseDialog} />
       </DialogContent>
     </Dialog>
   )

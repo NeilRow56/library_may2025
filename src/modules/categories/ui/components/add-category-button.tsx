@@ -1,7 +1,8 @@
 'use client'
 
-import { CategoryTitle2 } from '@/components/dialogs/category-title2'
+import AddCategoryDialog from '@/components/dialogs/add-category-dialog'
 import { Button } from '@/components/ui/button'
+import { PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 
 export const AddCategoryButton = () => {
@@ -9,9 +10,10 @@ export const AddCategoryButton = () => {
   return (
     <>
       <Button className='cursor-pointer self-end' onClick={() => setOpen(true)}>
-        Add Category title
+        <PlusIcon />
+        Add category
       </Button>
-      <CategoryTitle2 open={open} setOpen={setOpen} />
+      <AddCategoryDialog open={open} setOpen={setOpen} />
     </>
   )
 }

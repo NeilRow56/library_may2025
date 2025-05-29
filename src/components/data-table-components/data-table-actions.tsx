@@ -40,6 +40,7 @@ function DataTableActions<TData>({
           <DropdownMenuItem onClick={() => table.options.meta?.onEdit(item)}>
             {edit_label ? edit_label : 'Edit'}
           </DropdownMenuItem>
+
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => table.options.meta?.onDelete(item)}>
             {' '}

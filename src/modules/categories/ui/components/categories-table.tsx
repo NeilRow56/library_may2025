@@ -6,10 +6,8 @@ import { ConfirmationDialog } from '@/components/dialogs/confirmation-dialog'
 import { toast } from 'sonner'
 import { startTransition, useState } from 'react'
 import { usePathname } from 'next/navigation'
-
-// import AddCategoryDialog from '@/components/dialogs/category-dialog-component'
-import { CategoryTitle2 } from '@/components/dialogs/category-title2'
 import { deleteCategory } from '@/lib/actions/category'
+import AddCategoryDialog from '@/components/dialogs/add-category-dialog'
 
 type props = {
   data: {
@@ -56,7 +54,11 @@ function CategoriesTable({ data }: { data: props }) {
         onRowEdit={handleRowEdit}
       />
 
-      <CategoryTitle2 open={open} setOpen={setOpen} />
+      <AddCategoryDialog
+        open={open}
+        setOpen={setOpen}
+        category={itemToAction}
+      />
 
       <ConfirmationDialog
         open={openConfirmationDialog}
